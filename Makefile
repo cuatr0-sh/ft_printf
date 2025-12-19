@@ -1,6 +1,26 @@
-NAME = libftprintf.a
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: asoria <asoria@student.42madrid.com>       +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2025/12/19 01:39:22 by asoria            #+#    #+#              #
+#    Updated: 2025/12/19 02:26:36 by asoria           ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
 
-SRC = \
+NAME		:= libftprintf.a
+CC		?= cc
+CFLAGS		:= -Wall -Wextra -Werror -Wpedantic
+CPPFLAGS	:= -Iincludes
+AR		?= ar
+ARFLAGS		?= rcs
+RM		?= rm
+SRC_DIR		:= src
+OBJ_DIR		:= obj
+
+SRC := \
 	ft_printf.c \
 	printf_print_addr.c \
 	printf_print_hex.c \
@@ -9,23 +29,28 @@ SRC = \
 	printf_putnbr.c \
 	printf_putstr.c
 
-OBJ = $(SRC:.c=.o)
-
-CC = cc
-CFLAGS = -Wall -Wextra -Werror
+OBJ := $(SRC:%.c=$(OBJ_DIR)/%.o)
 
 all: $(NAME)
 
 $(NAME): $(OBJ)
-	ar rcs $(NAME) $(OBJ)
+	$(AR) $(ARFLAGS) $@ $^
 
-%.o: %.c ft_printf.h
-	$(CC) $(CFLAGS) -c $< -o $@
+$(OBJ_DIR):
+	mkdir -p $(OBJ_DIR)
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c includes/ft_printf.h | $(OBJ_DIR)
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJ)
+	$(RM) -rf $(OBJ_DIR)
 
-fclean: clean
-	rm -f $(NAME)
+fclean:
+	$(MAKE) clean
+	$(RM) -f $(NAME)
 
-re: fclean all
+re:
+	$(MAKE) fclean
+	$(MAKE) all
+
+.PHONY: all clean fclean re
